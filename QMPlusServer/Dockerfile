@@ -1,16 +1,17 @@
-FROM golang:1.12 AS build
+FROM golang:1.12-alpine
+
+# 缓存外部依赖。只要go.mod文件没有改变，就不需要再次下载。
+WORKDIR /go/mod/cache
+COPY ./go.mod .
+
+ENV GO111MODULE=on \
+    GOPROXY=https://goproxy.cn
+RUN go mod download
+
+# 不需要保存安装包
+RUN apk add --no-cache mysql-client
 
 WORKDIR /go/src/gin-vue-admin
 COPY . .
-
-ENV GO111MODULE=on
-ENV GOPROXY=https://goproxy.cn
-RUN go get ./... \
-    && go build -o gin-vue-admin
-
-FROM golang:1.12 AS serve
-
-COPY --from=build /go/src/gin-vue-admin /go/src/gin-vue-admin
-
-EXPOSE 8080
+RUN go build -ldflags="-s -w" -o gin-vue-admin
 ENTRYPOINT [ "./gin-vue-admin" ]

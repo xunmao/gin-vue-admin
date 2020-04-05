@@ -6,7 +6,7 @@
         "signingKey": "qmPlus"
     },
     "mysqladmin": {
-        "username": "root",
+        "username": "admin",
         "password": "Aa@6447985",
         "path": "127.0.0.1:3306",
         "dbname": "qmPlus",

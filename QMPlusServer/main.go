@@ -21,8 +21,8 @@ import (
 // @BasePath /
 
 var (
-	mysqlHost = os.Getenv("MYSQLHOST")
-	mysqlPort = os.Getenv("MYSQLPORT")
+	mysqlHost = os.Getenv("MYSQL_HOST")
+	mysqlPort = os.Getenv("MYSQL_PORT")
 )
 
 func main() {

@@ -2,6 +2,7 @@
 # https://docs.docker.com/compose/compose-file/
 
 version: "3.5"
+
 services:
   # 数据库的各种配置参数，请参考以下链接：
   # https://github.com/piexlmax/gin-vue-admin/blob/master/QMPlusServer/db/qmplus.sql#L4-L8
@@ -11,19 +12,32 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./QMPlusServer/db:/docker-entrypoint-initdb.d
+      - ./QMPlusServer/db/qmplus:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: Aa@6447985
+      MYSQL_ROOT_PASSWORD: rootpw
       MYSQL_DATABASE: qmPlus
-    user: root
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: Aa@6447985
+
   server:
     build: ./QMPlusServer
     ports:
-      - 8080:8080
       - 8888:8888
     environment:
-      MYSQLHOST: database
+      MYSQL_HOST: database
+      MYSQL_PORT: 3306
+      GIN_MODE: release
     working_dir: /go/src/gin-vue-admin
     restart: always
     depends_on:
       - database
+    # 覆盖镜像中默认的ENTRYPOINT
+    entrypoint: [
+        "sh",
+        "./wait-for-mysql.sh",
+        "database", # MySQL的Host
+        "admin", # 用户名
+        "Aa@6447985", # 密码
+        "10", # 重试间隔，秒
+        "./gin-vue-admin",
+      ]
